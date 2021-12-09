@@ -1,0 +1,20 @@
+
+Таблица Students имеет поля StudentId, FirstName, LastName, Groups и содержит информацию о студентах института. Таблица Exams имеет поля StudentId, ExamName, Result и содержит результаты экзаменов студентов.  
+
+a) написать SQL запрос, который выводит имена и фамилии студентов у которых больше двух экзаменов с результатом меньше 3.  
+b) написать SQL запрос, который выводит название групп, в которых таких студентов больше 10
+
+
+a) SELECT a.FirstName, a.LastName  
+ FROM Students a
+ INNER JOIN Exams b ON b.StudentId=a.StudentId
+ WHERE EXISTS (SELECT * FROM Exams WHERE StudentId=b.StudentId AND ExamName= b.ExamName) AND (b.Result < 3)
+GROUP BY a.StudentId
+HAVING COUNT(Result) > 2;
+
+b) SELECT a.Groups 
+FROM Students a
+WHERE StudentId = (SELECT a.StudentId FROM Students a INNER JOIN Exams b ON b.StudentId=a.StudentId 
+WHERE EXISTS (SELECT * FROM Exams WHERE StudentId=b.StudentId AND ExamName= b.ExamName) AND (b.Result < 3) GROUP BY a.StudentId HAVING COUNT(Result) > 2)
+GROUP BY a.StudentId
+HAVING COUNT(StudentId) > 10;
